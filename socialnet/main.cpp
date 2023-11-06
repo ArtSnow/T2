@@ -35,12 +35,12 @@ using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 
 #include "user_server/database/user.h"
-#include "messenger_server/database/messenger.h"
-#include "wall_server/database/wall.h"
+#include "ride_server/database/messenger.h"
+#include "route_server/database/route.h"
 
 #include "user_server/web_server/handlers/user_handler.h"
-#include "messenger_server/web_server/handlers/messenger_handler.h"
-#include "wall_server/web_server/handlers/wall_handler.h"
+#include "ride_server/web_server/handlers/messenger_handler.h"
+#include "route_server/web_server/handlers/route_handler.h"
 #include "web_interface_handler.h"
 
 class HTTPRequestFactory : public HTTPRequestHandlerFactory
@@ -63,8 +63,10 @@ public:
             hasSubstr(request.getURI(), "/contacts"))
             return new MessageHandler(_format);
 
-        if (hasSubstr(request.getURI(), "/wall"))
-            return new WallHandler(_format);
+        if (hasSubstr(request.getURI(), "/add_route")||
+            hasSubstr(request.getURI(), "/read_all_routes")||
+            hasSubstr(request.getURI(), "/search_route"))
+            return new RouteHandler(_format);
         
         return new WebPageHandler(_format);
     }
@@ -82,7 +84,7 @@ protected:
     {
             database::User::init();    
             database::Message::init();
-            database::Wall::init();               
+            database::Route::init();               
             ServerSocket svs(Poco::Net::SocketAddress("0.0.0.0", 8080));
             HTTPServer srv(new HTTPRequestFactory(DateTimeFormat::SORTABLE_FORMAT), svs, new HTTPServerParams);
             srv.start();
