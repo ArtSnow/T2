@@ -99,21 +99,10 @@ public:
                     form.has("user_id"))
             { 
                 long user_id = atol(form.get("user_id").c_str());
-                response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-                response.setChunkedTransferEncoding(true);
-                response.setContentType("application/json");
-                Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-                root->set("type", "/errors/not_found");
-                root->set("title", "Internal exception");
-                root->set("status", Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
-                root->set("detail", "AABNABABA");
-                root->set("instance", "/route");
-                std::ostream &ostr = response.send();
-                Poco::JSON::Stringifier::stringify(root, ostr);
-                return;
-                
-                auto results = database::Route::read_all_routes_by_user_id(user_id);
+
+                std::vector<database::Route> results = database::Route::read_all_routes_by_user_id(user_id);
                 Poco::JSON::Array arr;
+
                 for (auto s : results)
                     arr.add(s.toJSON());
                 response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

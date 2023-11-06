@@ -90,8 +90,9 @@ namespace database
             Route a;
             select << "SELECT route_id, creator_id, route_title, route_description, route_start, route_end FROM Route WHERE creator_id=? ",
                 into(a._route_id),
-                into(a._route_title),
                 into(a._creator_id),
+                into(a._route_title),
+                into(a._route_description),
                 into(a._route_start),
                 into(a._route_end),
                 use(user_id),
