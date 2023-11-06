@@ -205,7 +205,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /add_route:
     post:
-      summary: Добавление нового пользователя
+      summary: Добавление нового пути
       parameters:
       - name: creator_id
         description: ID создателя
@@ -256,8 +256,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /wall:
-        post:
+  /read_all_routes_by_user_id:
+        get:
             summary: Добавление новой записи на стену пользователя
             parameters:
                 - name: user_id
@@ -265,19 +265,7 @@ paths:
                   in: query
                   required: true
                   schema:
-                    type: integer                
-                - name: post_title
-                  in: query
-                  description: Заголовок поста
-                  required: true
-                  schema:
-                      type: string
-                - name: post_text
-                  in: query
-                  description: Содержание поста
-                  required: true
-                  schema:
-                      type: string                      
+                    type: integer                        
             responses:
                 "200":
                     description: id поста
@@ -297,35 +285,6 @@ paths:
                         application/json:
                          schema:
                             $ref: '#/components/schemas/Error'
-        get:
-            summary: Получение списка записей на стене пользователя
-            parameters:
-                - name: user_id
-                  in: query
-                  description: id стены (текущего пользователя)
-                  required: true
-                  schema:
-                      type: integer
-            responses:
-                '200':
-                    description: Successfully loaded wall posts
-                    content:
-                     application/json:
-                      schema:
-                        $ref: '#/components/schemas/wall'   
-                404:
-                    description: Error while loading wall posts
-                    content:
-                        application/json:
-                         schema:
-                            $ref: '#/components/schemas/Error'
-                500:
-                    description: Unexpected Error. Oops! Something went wrong! X/
-                    content:
-                        application/json:
-                         schema:
-                            $ref: '#/components/schemas/Error'   
-
 components:
   schemas:
     user_id:
