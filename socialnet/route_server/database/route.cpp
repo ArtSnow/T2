@@ -23,7 +23,6 @@ namespace database
     {
         try
         {
-
             Poco::Data::Session session = database::Database::get().create_session();
             Statement create_stmt(session);
             create_stmt << "CREATE TABLE IF NOT EXISTS `Route` (`route_id` INT NOT NULL AUTO_INCREMENT,"
@@ -34,6 +33,7 @@ namespace database
                         << "`route_end` text NOT NULL ,"
                         << "PRIMARY KEY (`route_id`));",
                 now;
+
         }
 
         catch (Poco::Data::MySQL::ConnectionException &e)
@@ -160,7 +160,6 @@ namespace database
             throw;
         }
     }
-
     long Route::get_route_id() const
     {
         return _route_id;

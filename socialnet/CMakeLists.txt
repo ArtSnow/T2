@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(hl_server C CXX)
 
-SET (EXAMPLE_BINARY "socialnet")
+SET (EXAMPLE_BINARY "travelservice")
 set (WRITER_MAIN "writer_main")
 set (STD_CXX "c++17")
 set (REDISCPP_FLAGS "-DREDISCPP_HEADER_ONLY=ON")
@@ -26,8 +26,8 @@ add_executable(${EXAMPLE_BINARY} main.cpp
                                  data_cache/cache.cpp
                                  user_server/database/database.cpp
                                  user_server/database/user.cpp
-                                 messenger_server/database/messenger.cpp
-                                 wall_server/database/wall.cpp)
+                                 route_server/database/route.cpp
+                                 ride_server/database/ride.cpp)
 
 add_executable(load_data load_data.cpp)
 

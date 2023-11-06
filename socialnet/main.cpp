@@ -35,11 +35,11 @@ using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 
 #include "user_server/database/user.h"
-#include "ride_server/database/messenger.h"
+#include "ride_server/database/ride.h"
 #include "route_server/database/route.h"
 
 #include "user_server/web_server/handlers/user_handler.h"
-#include "ride_server/web_server/handlers/messenger_handler.h"
+#include "ride_server/web_server/handlers/ride_handler.h"
 #include "route_server/web_server/handlers/route_handler.h"
 #include "web_interface_handler.h"
 
@@ -59,9 +59,10 @@ public:
             hasSubstr(request.getURI(),"/auth")) 
             return new UserHandler(_format);
 
-        if (hasSubstr(request.getURI(), "/message")||
-            hasSubstr(request.getURI(), "/contacts"))
-            return new MessageHandler(_format);
+        if (hasSubstr(request.getURI(), "/add_ride")||
+            hasSubstr(request.getURI(), "/read_ride_by_id")||
+            hasSubstr(request.getURI(), "/add_passenger"))
+            return new RideHandler(_format);
 
         if (hasSubstr(request.getURI(), "/add_route")||
             hasSubstr(request.getURI(), "/read_all_routes")||
@@ -83,7 +84,7 @@ protected:
     int main([[maybe_unused]] const std::vector<std::string> &args)
     {
             database::User::init();    
-            database::Message::init();
+            database::Ride::init();
             database::Route::init();               
             ServerSocket svs(Poco::Net::SocketAddress("0.0.0.0", 8080));
             HTTPServer srv(new HTTPRequestFactory(DateTimeFormat::SORTABLE_FORMAT), svs, new HTTPServerParams);

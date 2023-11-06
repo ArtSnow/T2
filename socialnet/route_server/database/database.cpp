@@ -18,50 +18,6 @@ namespace database{
         Poco::Data::MySQL::Connector::registerConnector();
     }
 
-    size_t Database::get_max_shard(){
-        return 2;
-    }
-
-    std::vector<std::string> Database::get_all_hints(){
-        std::vector<std::string> result;
-        for(size_t i=0;i<=get_max_shard();++i){
-            std::string shard_name = "-- sharding:";
-            shard_name += std::to_string(i);
-            result.push_back(shard_name);
-        }
-        return result;
-    }
-
-    // for messenger upd
-    std::string Database::sharding_hint_old(long from, long to){
-
-        std::string key;
-
-        key += std::to_string(from);
-        key += ";";
-        key += std::to_string(to);
-
-        size_t shard_number = std::hash<std::string>{}(key)%get_max_shard();
-
-        std::string result = "-- sharding:";
-        result += std::to_string(shard_number);
-        return result;
-    }
-
-
-    std::string Database::sharding_hint(long id){
-
-        std::string key;
-
-        key += std::to_string(id);
-
-        size_t shard_number = std::hash<std::string>{}(key)%(get_max_shard()+1);
-
-        std::string result = "-- sharding:";
-        result += std::to_string(shard_number);
-        return result;
-    }
-
     Database& Database::get(){
         static Database _instance;
         return _instance;
