@@ -203,23 +203,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /message:
-    get:
-      summary: Получение списка сообщений между пользователями
-      description: Метод возвращает сообщения для указанных пользователей
+  /add_route:
+    post:
+      summary: Добавление нового пользователя
       parameters:
-      - name: id_from
-        description: Уникальный id автора отправителя сообщений
+      - name: creator_id
+        description: ID создателя
         in: query
         required: true
         schema:
-          $ref: '#/components/schemas/user_id'
-      - name: id_to
-        description: Уникальный id автора получателя сообщений
+          type: string
+      - name: route_title
+        description: Название маршрута
         in: query
         required: true
         schema:
-          $ref: '#/components/schemas/user_id'
+          type: string
+      - name: route_description
+        description: Описание маршрута
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: route_start
+        description: Место старта
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: route_end
+        description: Место конца
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Message history of id_to and id_from
@@ -233,46 +250,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/messages'
-        500:
-          description: Unexpected Error. Oops! Something went wrong! X/
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    post:
-      summary: Send message
-      parameters:
-      - name: id_from
-        description: id автора - отправителя сообщения
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: id_to
-        description: id автора - получателя сообщения
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: message
-        description: Message contents. Message is created.
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: id сообщения
-          content:
-            application/json:
-              schema:
-                type: integer
-        404:
-          description: Error while sending the message.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected Error. Oops! Something went wrong! X/
           content:
