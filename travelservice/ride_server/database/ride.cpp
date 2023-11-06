@@ -30,7 +30,7 @@ namespace database
                         << "`creator_id` INT NOT NULL,"
                         << "`ride_time` INT NOT NULL,"
                         << "`ride_passengers` VARCHAR(256) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,"
-                        << "PRIMARY KEY (id));",
+                        << "PRIMARY KEY (ride_id));",
                         now;
 
              std::cout << create_stmt.toString() << std::endl;

@@ -28,9 +28,9 @@
 -> Протестируйте его работу в Docker
 
 # Launch Help
-Запуск осуществляется из папки [Docker](https://github.com/natalia-sd/Software-Arch/tree/main/socialnet/Docker) (cd Software-Arch/socialnet/Docker) при помощи комманды `docker-compose up --build`.
+Запуск осуществляется из папки [Docker](https://github.com/natalia-sd/Software-Arch/tree/main/travelservice/Docker) (cd Software-Arch/travelservice/Docker) при помощи комманды `docker-compose up --build`.
 
-Тестовые данные находятся в [commands.sql](https://github.com/natalia-sd/Software-Arch/blob/main/socialnet/commands.sql).
+Тестовые данные находятся в [commands.sql](https://github.com/natalia-sd/Software-Arch/blob/main/travelservice/commands.sql).
 
 
 ### UPD. H/W No. 3 SHARDING

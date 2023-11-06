@@ -1,7 +1,7 @@
 openapi: '3.0.0'
 info:
   version: '1.0.0'
-  title: 'Software-Arch Social Net API'
+  title: 'Software-Arch Travel Service API'
   description: API пользователя для второго (3го) домашнего задания по курсу Архитектура ПО
 servers:
   - url: http://localhost:8080

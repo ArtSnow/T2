@@ -156,7 +156,7 @@ services:
       - cache
       - kafka-node-1
 
-  social_network:
+  travel_network:
     build:
       context: ../
       dockerfile: Docker/travel_service/Dockerfile
