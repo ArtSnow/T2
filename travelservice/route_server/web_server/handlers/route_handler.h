@@ -111,6 +111,7 @@ public:
                 std::ostream &ostr = response.send();
                 Poco::JSON::Stringifier::stringify(root, ostr);
                 return;
+                
                 auto results = database::Route::read_all_routes_by_user_id(user_id);
                 Poco::JSON::Array arr;
                 for (auto s : results)
