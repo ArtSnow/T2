@@ -65,7 +65,7 @@ public:
             return new RideHandler(_format);
 
         if (hasSubstr(request.getURI(), "/add_route")||
-            hasSubstr(request.getURI(), "/read_all_routes")||
+            hasSubstr(request.getURI(), "/read_all_routes_by_user_id")||
             hasSubstr(request.getURI(), "/search_route"))
             return new RouteHandler(_format);
         
