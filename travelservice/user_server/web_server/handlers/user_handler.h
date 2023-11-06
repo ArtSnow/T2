@@ -212,39 +212,36 @@ public:
                 Poco::JSON::Stringifier::stringify(root, ostr);
                 return;
             }
-            else if (hasSubstr(request.getURI(), "/search"))
+            else if (hasSubstr(request.getURI(), "/search_by_login"))
             {
-                if (hasSubstr(request.getURI(), "/search_by_login"))
-                {
-                    std::string login = form.get("login");
-                    auto results = database::User::search_by_login(login);
-                    Poco::JSON::Array arr;
-                    for (auto s : results)
-                        arr.add(remove_password(s.toJSON()));
-                    response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-                    response.setChunkedTransferEncoding(true);
-                    response.setContentType("application/json");
-                    std::ostream &ostr = response.send();
-                    Poco::JSON::Stringifier::stringify(arr, ostr);
+                std::string login = form.get("login");
+                auto results = database::User::search_by_login(login);
+                Poco::JSON::Array arr;
+                for (auto s : results)
+                    arr.add(remove_password(s.toJSON()));
+                response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                response.setChunkedTransferEncoding(true);
+                response.setContentType("application/json");
+                std::ostream &ostr = response.send();
+                Poco::JSON::Stringifier::stringify(arr, ostr);
 
-                    return;
-                } else {
-                    std::string fn = form.get("first_name");
-                    std::string ln = form.get("last_name");
-                    auto results = database::User::search(fn, ln);
-                    Poco::JSON::Array arr;
-                    for (auto s : results)
-                        arr.add(remove_password(s.toJSON()));
-                    response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-                    response.setChunkedTransferEncoding(true);
-                    response.setContentType("application/json");
-                    std::ostream &ostr = response.send();
-                    Poco::JSON::Stringifier::stringify(arr, ostr);
+                return;
+            } else if (hasSubstr(request.getURI(), "/search_by_name")){
+                std::string fn = form.get("first_name");
+                std::string ln = form.get("last_name");
+                auto results = database::User::search(fn, ln);
+                Poco::JSON::Array arr;
+                for (auto s : results)
+                    arr.add(remove_password(s.toJSON()));
+                response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                response.setChunkedTransferEncoding(true);
+                response.setContentType("application/json");
+                std::ostream &ostr = response.send();
+                Poco::JSON::Stringifier::stringify(arr, ostr);
 
-                    return;
-                }
-
+                return;
             }
+            
             else if (hasSubstr(request.getURI(), "/user") && request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
             {
                 if (form.has("first_name") && form.has("last_name") && form.has("email") && form.has("birthday") && form.has("login") && form.has("password"))

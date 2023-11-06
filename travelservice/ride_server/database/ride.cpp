@@ -130,7 +130,7 @@ namespace database
                 use(ride_id),
                 range(0, 1); //  iterate over result set one row at a time
             
-                select.execute(); 
+            select.execute(); 
         }
 
         catch (Poco::Data::MySQL::ConnectionException &e)
@@ -151,8 +151,7 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement insert(session);
 
-            insert << "INSERT INTO Ride (ride_id, route_id, creator_id, ride_time, ride_passengers,) VALUES(?, ?, ?, ?, ?)",
-                use(_ride_id),
+            insert << "INSERT INTO Ride (route_id, creator_id, ride_time, ride_passengers,) VALUES(?, ?, ?, ?)",
                 use(_route_id),
                 use(_creator_id),
                 use(_ride_time),

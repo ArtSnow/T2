@@ -56,8 +56,6 @@ using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 
 #include "../../database/route.h"
-#include "../../../route_server/database/route.h"
-#include "../../../user_server/database/user.h"
 #include "../../../helper.h"
 
 static bool hasSubstr(const std::string &str, const std::string &substr)
@@ -92,34 +90,31 @@ public:
 
         try
         {
-            if (hasSubstr(request.getURI(), "/add_route") && request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
+            if (hasSubstr(request.getURI(), "/add_route") && request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST&&
+                form.has("creator_id")&& 
+                form.has("route_title")&& 
+                form.has("route_description")&&
+                form.has("route_start")&&
+                form.has("route_end"))
             {
-                if (form.has("creator_id")&& 
-                    form.has("route_title")&& 
-                    form.has("route_description")&&
-                    form.has("route_start")&&
-                    form.has("route_end"))
-                {
-                    database::Route route;
-                    route.creator_id() = atol(form.get("user_id").c_str());
-                    route.route_title() = form.get("route_title");
-                    route.route_description() = form.get("route_description");
-                    route.route_start() = form.get("route_start");
-                    route.route_end() = form.get("route_end");
-                    route.save_to_mysql();
-                    response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-                    response.setChunkedTransferEncoding(true);
-                    response.setContentType("application/json");
-                    std::ostream &ostr = response.send();
-                    ostr << route.get_route_id();
-                    return;
-                }
+                database::Route route;
+                route.creator_id() = atol(form.get("user_id").c_str());
+                route.route_title() = form.get("route_title");
+                route.route_description() = form.get("route_description");
+                route.route_start() = form.get("route_start");
+                route.route_end() = form.get("route_end");
+                route.save_to_mysql();
+                response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                response.setChunkedTransferEncoding(true);
+                response.setContentType("application/json");
+                std::ostream &ostr = response.send();
+                ostr << route.get_route_id();
+                return;
             } else if (hasSubstr(request.getURI(), "/read_all_routes_by_user_id") && (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET) &&
                     form.has("user_id"))
             { 
                 long user_id = atol(form.get("user_id").c_str());
-                database::Route route;
-                auto results = route.read_all_routes_by_user_id(user_id);
+                auto results = database::Route::read_all_routes_by_user_id(user_id);
                 Poco::JSON::Array arr;
                 for (auto s : results)
                     arr.add(s.toJSON());

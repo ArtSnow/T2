@@ -19,7 +19,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/HelpFormatter.h"
-#include <iostream>
+
 #include <iostream>
 #include <fstream>
 
@@ -43,7 +43,23 @@ using Poco::Util::OptionCallback;
 using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 
-#include "../../database/ride.h"
+#include "../../../ride_server/database/ride.h"
+#include "../../../helper.h"
+
+static bool hasSubstr(const std::string &str, const std::string &substr)
+{
+    if (str.size() < substr.size())
+        return false;
+    for (size_t i = 0; i <= str.size() - substr.size(); ++i)
+    {
+        bool ok{true};
+        for (size_t j = 0; ok && (j < substr.size()); ++j)
+            ok = (str[i + j] == substr[j]);
+        if (ok)
+            return true;
+    }
+    return false;
+}
 
 class RideHandler : public HTTPRequestHandler
 {
@@ -56,77 +72,71 @@ public:
                        HTTPServerResponse &response)
     {
         HTMLForm form(request, request.stream());
-        if (form.has("contact_id") && (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET))
+        try
         {
-            long id = atol(form.get("contact_id").c_str());
-            try
+            
+            if (hasSubstr(request.getURI(), "/add_ride") && (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) &&
+                form.has("route_id")&&
+                form.has("creator_id")&&
+                form.has("ride_time"))
             {
-                std::vector<long> results = database::Ride::all_contact(id);
-                if (!results.empty())
-                {
-                    std::string result_str = "[";
-                    for (size_t i = 0; i < results.size(); ++i)
-                    {
-                        result_str += "{ \"id\" :";
-                        result_str += std::to_string(results[i]);
-                        result_str += "}";
-                        if (i != results.size() - 1)
-                            result_str += ",";
-                    }
-                    result_str += "]";
-                    response.setChunkedTransferEncoding(true);
-                    response.setContentType("application/json");
-                    std::ostream &ostr = response.send();
-
-                    ostr << result_str;
-                    return;
-                }
-                else
-                {
-                    response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-                    std::ostream &ostr = response.send();
-                    ostr << "{ \"result\": false , \"reason\": \"not found\" }";
-                    response.send();
-                }
-            }
-            catch (...)
-            {
-                response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+                database::Ride ride;
+                ride.route_id() = atol(form.get("route_id").c_str());
+                ride.creator_id() = atol(form.get("creator_id").c_str());
+                ride.ride_time() = atol(form.get("ride_time").c_str());
+                ride.ride_passengers() = "";
+                ride.save_to_mysql();
+                response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                response.setChunkedTransferEncoding(true);
+                response.setContentType("application/json");
                 std::ostream &ostr = response.send();
-                ostr << "{ \"result\": false , \"reason\": \"not found\" }";
-                response.send();
+                ostr << ride.get_ride_id();
+                return;
+                
+            }
+            else if (hasSubstr(request.getURI(), "/add_passenger") && request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST&&
+                form.has("ride_id")&&
+                form.has("user_id"))
+            {
+                long ride_id = atol(form.get("ride_id").c_str());
+                long user_id = atol(form.get("user_id").c_str());
+                database::Ride ride;
+                ride.add_passenger(ride_id, user_id);
+                response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                response.setChunkedTransferEncoding(true);
+                response.setContentType("application/json");
+                std::ostream &ostr = response.send();
+                ostr << ride.get_ride_id();
+                return;
+            } else if (hasSubstr(request.getURI(), "/read_ride_by_id") && request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST&&
+                        form.has("ride_id")) 
+            {
+                long ride_id = atol(form.get("ride_id").c_str());
+                std::optional<database::Ride> result = database::Ride::read_ride_by_id(ride_id);
+                response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                response.setChunkedTransferEncoding(true);
+                response.setContentType("application/json");
+                std::ostream &ostr = response.send();
+                Poco::JSON::Stringifier::stringify(result->toJSON(), ostr);
+
+                return;
             }
         }
-        else if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-        {
-            if (form.has("id_from")&&form.has("id_to")&&form.has("message"))
-                    {
-                        std::cout << "add message" << std::endl;
-                        database::Message message;
-                        message.id_from() = atol(form.get("id_from").c_str());
-                        message.id_to() = atol(form.get("id_to").c_str());
-                        message.message() = form.get("message");
-
-                        try
-                        {
-                            message.save_to_mysql();
-                            response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-                            response.setChunkedTransferEncoding(true);
-                            response.setContentType("application/json");
-                            std::ostream &ostr = response.send();
-                            ostr << message.get_id();
-                            return;
-                        }
-                        catch (...)
-                        {
-                            response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-                            std::ostream &ostr = response.send();
-                            ostr << "{ \"result\": false , \"reason\": \"exception\" }";
-                            response.send();
-                        }
-                    }
+        catch (...) {   
         }
+        response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
+        response.setChunkedTransferEncoding(true);
+        response.setContentType("application/json");
+        Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+        root->set("type", "/errors/not_found");
+        root->set("title", "Internal exception");
+        root->set("status", Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
+        root->set("detail", "request not found");
+        root->set("instance", "/ride");
+        std::ostream &ostr = response.send();
+        Poco::JSON::Stringifier::stringify(root, ostr);
     }
+
 
 private:
     std::string _format;
