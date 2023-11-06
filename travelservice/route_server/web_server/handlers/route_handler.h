@@ -83,7 +83,7 @@ public:
                 form.has("route_end"))
             {
                 database::Route route;
-                route.creator_id() = atol(form.get("user_id").c_str());
+                route.creator_id() = atol(form.get("creator_id").c_str());
                 route.route_title() = form.get("route_title");
                 route.route_description() = form.get("route_description");
                 route.route_start() = form.get("route_start");
