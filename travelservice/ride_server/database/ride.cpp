@@ -85,7 +85,7 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement select(session);
             Ride a;
-            select << "SELECT ride_id, route_id, creator_id, ride_time, ride_passengers FROM Ride where ride_id=?",
+            select << "SELECT ride_id, route_id, creator_id, ride_time, ride_passengers FROM Ride WHERE ride_id=?",
                 into(a._ride_id),
                 into(a._route_id),
                 into(a._creator_id),
@@ -117,20 +117,22 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement select(session);
             std::string passengers;
-            select << "SELECT ride_passengers FROM Rid where ride_id=?",
+            select << "SELECT ride_passengers FROM Ride WHERE ride_id=?",
                 into(passengers),
                 use(ride_id),
                 range(0, 1);
             select.execute();
-
+            // std::cout << passengers;
             passengers += std::to_string(user_id) + ";";
-
-            select << "UPDATE Ride SET ride_passengers=? where ride_id=?",
+            // std::cout << passengers;
+            // return;
+            Poco::Data::Statement update(session);
+            update << "UPDATE Ride SET ride_passengers=? WHERE ride_id=?",
                 use(passengers),
                 use(ride_id),
                 range(0, 1); //  iterate over result set one row at a time
             
-            select.execute(); 
+            update.execute(); 
         }
 
         catch (Poco::Data::MySQL::ConnectionException &e)
@@ -151,7 +153,7 @@ namespace database
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement insert(session);
 
-            insert << "INSERT INTO Ride (route_id, creator_id, ride_time, ride_passengers,) VALUES(?, ?, ?, ?)",
+            insert << "INSERT INTO Ride (route_id, creator_id, ride_time, ride_passengers) VALUES(?, ?, ?, ?) ",
                 use(_route_id),
                 use(_creator_id),
                 use(_ride_time),

@@ -93,7 +93,7 @@ public:
                 std::ostream &ostr = response.send();
                 ostr << ride.get_ride_id();
                 return;
-            } else if (hasSubstr(request.getURI(), "/read_ride_by_id") && request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST&&
+            } else if (hasSubstr(request.getURI(), "/read_ride_by_id") && request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET&&
                         form.has("ride_id")) 
             {
                 long ride_id = atol(form.get("ride_id").c_str());
